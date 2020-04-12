@@ -1,0 +1,98 @@
+<ion-split-pane contentId="map-content">
+  <ion-menu contentId="map-content">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>
+          Saved Addresses
+        </ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <ion-item *ngIf="!addresses.length">
+          <p>
+            You have no saved addresses.
+            Please select an address from the map
+          </p>
+        </ion-item>
+        <ion-item *ngFor="let address of addresses" button (click)="highlight(address)">
+          <ion-label>
+            <p>{{ address.addressLine1 }}</p>
+            <p *ngIf="address.addressLine2">{{ address.addressLine2 }}</p>
+            <p>{{ address.city }}, {{ address.state }} {{ address.zipCode }}</p>
+          </ion-label>
+          <ion-icon name="checkmark" slot="end" *ngIf="addressEquals(selectedAddress,address)"></ion-icon>
+          <ion-icon name="pin" slot="end" (click)="provision(address)"
+            *ngIf="addressEquals(highlightedAddress,address)"></ion-icon>
+          <ion-icon name="trash" slot="end" (click)="onDeleteClick(address)"
+            *ngIf="addressEquals(highlightedAddress,address)">
+          </ion-icon>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <ion-title>
+          Your Information
+        </ion-title>
+      </ion-toolbar>
+      <form [formGroup]="endpointForm" (ngSubmit)="saveEndpoint()">
+        <ion-item>
+          <ion-label position="floating">Name</ion-label>
+          <ion-input formControlName="name" #endpointName></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Phone</ion-label>
+          <ion-input formControlName="elin"></ion-input>
+        </ion-item>
+        <ion-button type="submit" [disabled]="!endpointForm.valid || !endpointForm.dirty" expand="block"
+          color="tertiary">Save</ion-button>
+      </form>
+    </ion-footer>
+  </ion-menu>
+  <section class="ion-page" id="map-content">
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-toggle>
+            <ion-button>
+              <ion-icon slot="icon-only" name="menu"></ion-icon>
+            </ion-button>
+          </ion-menu-toggle>
+        </ion-buttons>
+        <ion-title>Select Location</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <agm-map [latitude]="+highlightedAddress?.latitude" [longitude]="+highlightedAddress?.longitude" [zoom]="18"
+        [clickableIcons]="true" [showDefaultInfoWindow]="false" [usePanning]="true" (mapClick)="onMapClick($event)">
+        <!--Display all saved addresses-->
+        <agm-marker *ngFor="let address of addresses" (markerClick)="provisionAsync(address)" [latitude]="+address.latitude"
+          [longitude]="+address.longitude">
+          <agm-info-window [isOpen]="addressEquals(highlightedAddress,address)" [maxWidth]="300">
+            <ion-item>
+              <ion-label>
+                <p>{{ address.addressLine1 }}</p>
+                <p *ngIf="address.addressLine2">{{ address.addressLine2 }}</p>
+                <p>{{ address.city }}, {{ address.state }} {{ address.zipCode }}</p>
+              </ion-label>
+            </ion-item>
+            <ion-toolbar>
+              <ion-buttons slot="end">
+                <ion-button *ngIf="!address?.addressId" slot="icon-only" (click)="save(address)">
+                  <ion-icon name="save"></ion-icon>
+                </ion-button>
+                <ion-button slot="icon-only" (click)="provision(address)">
+                  <ion-icon name="pin"></ion-icon>
+                </ion-button>
+                <ion-button slot="icon-only" (click)="onDeleteClick(address)">
+                  <ion-icon name="trash"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </agm-info-window>
+        </agm-marker>
+      </agm-map>
+    </ion-content>
+  </section>
+</ion-split-pane>

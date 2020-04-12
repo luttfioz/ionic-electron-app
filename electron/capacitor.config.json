@@ -1,0 +1,7 @@
+{
+  "appId": "com.walkingriver.pinpoint",
+  "appName": "pinpoint",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www"
+}
